@@ -12,7 +12,9 @@ export const useLoginForm = () => {
       },
     })
 
-  const [login, loginProps] = defineField('login')
+  const [login, loginProps] = defineField('login', {
+    validateOnModelUpdate: false, //пока юзер вводит ошибок не будет
+  })
 
   const [password, passwordProps] = defineField('password')
 
