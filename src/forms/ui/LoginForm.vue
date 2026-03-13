@@ -1,20 +1,53 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useLoginForm } from '../model/use-login-form'
+
+const {
+  login,
+  loginProps,
+  password,
+  passwordProps,
+  handleSubmit,
+  errors,
+  meta,
+} = useLoginForm()
+
+const submit = handleSubmit((values) => {
+  console.log('Validated values:', values)
+})
+</script>
 
 <template>
   <form
     class="form"
-    @submit.prevent=""
+    @submit.prevent="submit"
   >
     <h2>Login Form</h2>
     <input
+      v-model="login"
+      v-bind="loginProps"
       type="text"
       placeholder="Введите логин"
     />
+
     <input
+      v-model="password"
+      v-bind="passwordProps"
       type="password"
       placeholder="Введите пароль"
     />
-    <button type="submit">Войти</button>
+    <div
+      class="errors"
+      v-if="errors.password || errors.login"
+    >
+      <p>{{ errors.password }}</p>
+      <p>{{ errors.login }}</p>
+    </div>
+    <button
+      type="submit"
+      :disabled="!meta.valid"
+    >
+      Войти
+    </button>
   </form>
 </template>
 
@@ -37,5 +70,10 @@ input {
 }
 input:focus-visible {
   outline: none;
+}
+.errors {
+  max-width: 220px;
+  font-size: 14px;
+  text-align: center;
 }
 </style>
