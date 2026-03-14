@@ -3,14 +3,19 @@ import { useForm } from 'vee-validate'
 import { loginSchema, type LoginType } from './schema'
 
 export const useLoginForm = () => {
-  const { handleSubmit, errors, defineField, meta } =
-    useForm<LoginType>({
-      validationSchema: toTypedSchema(loginSchema),
-      initialValues: {
-        login: '',
-        password: '',
-      },
-    })
+  const {
+    values,
+    handleSubmit,
+    errors,
+    defineField,
+    meta,
+  } = useForm<LoginType>({
+    validationSchema: toTypedSchema(loginSchema),
+    initialValues: {
+      login: '',
+      password: '',
+    },
+  })
 
   const [login, loginProps] = defineField('login', {
     validateOnModelUpdate: false, //пока юзер вводит ошибок не будет
@@ -26,5 +31,6 @@ export const useLoginForm = () => {
     handleSubmit,
     errors,
     meta,
+    values,
   }
 }
