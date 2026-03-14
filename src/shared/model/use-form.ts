@@ -18,8 +18,7 @@ export function useUniversalForm<
     validationSchema: toTypedSchema(schema),
   })
 
-  const plainFields: FormFields<FormValues> =
-    {} as FormFields<FormValues>
+  const plainFields = {} as FormFields<FormValues>
 
   const keys = Object.keys(
     schema.shape,
