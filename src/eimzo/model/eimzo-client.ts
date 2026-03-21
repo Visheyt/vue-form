@@ -6,8 +6,6 @@ export const EimzoBase64 = {
     btoa(unescape(encodeURIComponent(s))),
 }
 
-export type DomainAPIKeys = string[]
-
 // --- CAPI WebSocket Bridge ---
 const CAPIWS = {
   URL:
@@ -48,7 +46,7 @@ const CAPIWS = {
 
 // --- EIMZO Client ---
 export class EIMZOClient {
-  private API_KEYS: DomainAPIKeys = [
+  private API_KEYS = [
     'localhost',
     '96D0C1491615C82B9A54D9989779DF825B690748224C2B04F500F370D51827CE2644D8D4A82C18184D73AB8530BB8ED537269603F61DB0D03D2104ABF789970B',
     '127.0.0.1',
@@ -86,12 +84,21 @@ export class EIMZOClient {
     })
     if (!data.success) throw new Error(data.reason)
 
-    return data.certificates.map((cert: Certificate) => ({
-      ...cert,
-      ...this._parseAlias(cert.alias),
-      type: 'pfx',
-      id: cert.serialNumber,
-    }))
+    const now = new Date()
+
+    return data.certificates
+      .map((cert: Certificate) => ({
+        ...cert,
+        ...this.parseAlias(cert.alias),
+        type: 'pfx',
+        id: cert.serialNumber,
+      }))
+      .filter((cert: any) => {
+        const expiry = new Date(
+          cert.validTo.replace(/\./g, '-'),
+        )
+        return expiry > now
+      })
   }
 
   /** Загрузить ключ (E-IMZO prompt для пароля) */
@@ -125,27 +132,29 @@ export class EIMZOClient {
   }
 
   /** Парсинг Alias сертификата */
-  private _parseAlias(alias: string) {
-    const clean = alias
-      .toUpperCase()
-      .replace('1.2.860.3.16.1.1=', 'INN=')
-      .replace('1.2.860.3.16.1.2=', 'PINFL=')
-
-    const extract = (field: string) => {
-      const parts = clean.split(',')
-      for (let s of parts) {
-        if (s.includes(`${field}=`))
-          return s.split('=')[1].trim()
-      }
-      return ''
+  private parseAlias(alias: string) {
+    const extract = (key: string): string => {
+      const regex = new RegExp(
+        `(?:,|^)${key.toLowerCase()}=([^,]+)`,
+        'i',
+      )
+      const match = alias.match(regex)
+      return match ? match[1].trim() : ''
     }
 
+    const inn = extract('1.2.860.3.16.1.1')
+    const pinfl = extract('1.2.860.3.16.1.2')
+    const org = extract('o')
+
     return {
-      inn: extract('INN') || extract('UID'),
-      pinfl: extract('PINFL'),
-      cn: extract('CN'),
-      org: extract('O'),
-      serial: extract('SERIALNUMBER'),
+      inn: inn || extract('uid'),
+      pinfl: pinfl,
+      cn: extract('cn'),
+      org: org,
+      isCompany: !!org || !!inn,
+      serial: extract('serialnumber'),
+      validFrom: extract('validfrom'),
+      validTo: extract('validto'),
     }
   }
 }

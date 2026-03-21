@@ -11,6 +11,9 @@ export type Certificate = {
   disk: string
   path: string
   name: string
+  validTo: string
+  validFrom: string
+  isCompany: boolean
 }
 
 export type CAPIResponse = {
