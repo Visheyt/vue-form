@@ -1,3 +1,3 @@
-import EimzoSigner from './ui/EimzoSigner.vue'
+import EimzoModal from './ui/EimzoModal.vue'
 
-export { EimzoSigner }
+export { EimzoModal }

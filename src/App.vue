@@ -1,11 +1,20 @@
 <script setup lang="ts">
-import { EimzoSigner } from './eimzo'
+import { ref } from 'vue'
+
 import { LoginForm } from './forms'
+import { EimzoModal } from './eimzo'
+
+const isDialogVisible = ref(false)
+
+const toggleDialog = () => {
+  isDialogVisible.value = !isDialogVisible.value
+}
 </script>
 
 <template>
   <LoginForm />
-  <EimzoSigner />
+  <EimzoModal v-model="isDialogVisible" />
+  <button @click="toggleDialog">Login via EIMZO</button>
 </template>
 
 <style scoped></style>

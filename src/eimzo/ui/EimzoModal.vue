@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 
 import { EIMZOClient } from '../model/eimzo-client'
 import type { Certificate } from '../model/types'
+import Dialog from '@/shared/ui/Dialog.vue'
 
 const eimzo = new EIMZOClient()
 const version = ref<number | null>(null)
@@ -31,18 +32,18 @@ const signContent = async (cert: Certificate) => {
     console.error('Ошибка подписи:', err)
   }
 }
+
+const isDialogVisible = defineModel<boolean>({
+  required: true,
+})
 </script>
 
 <template>
-  <div>
-    <h3>E-IMZO версия: {{ version }}</h3>
-    <div
-      v-if="errorMsg"
-      style="color: red"
-    >
-      {{ errorMsg }}
-    </div>
-    <ul>
+  <Dialog v-model="isDialogVisible">
+    <h2>Авторизация через E-IMZO</h2>
+    <p>Выберите сертификат для входа:</p>
+
+    <ul class="list">
       <li
         v-for="cert in certificates"
         :key="cert.id"
@@ -59,6 +60,24 @@ const signContent = async (cert: Certificate) => {
           Подписать
         </button>
       </li>
-    </ul>
-  </div>
+    </ul></Dialog
+  >
 </template>
+
+<style>
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-size: 14px;
+}
+.list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 10px;
+}
+</style>
