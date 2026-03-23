@@ -71,6 +71,6 @@ const isDialogVisible = defineModel<boolean>({
 
 .pop-enter-from .content,
 .pop-leave-to .content {
-  transform: scale(0.8);
+  transform: scale(0.1);
 }
 </style>
