@@ -28,7 +28,6 @@ const isDialogVisible = defineModel<boolean>({
 </template>
 
 <style scoped>
-/* Фон */
 .wrapper {
   display: flex;
   align-items: center;
@@ -51,6 +50,7 @@ const isDialogVisible = defineModel<boolean>({
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 10px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
