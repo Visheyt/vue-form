@@ -48,14 +48,17 @@ const isDialogVisible = defineModel<boolean>({
         v-for="cert in certificates"
         :key="cert.id"
       >
-        {{ cert.userType }}
-        {{
-          cert.userType === 'PHYSICAL' ||
-          cert.userType === 'ENTREPRENEUR'
-            ? cert.cn?.toUpperCase()
-            : cert.org?.toUpperCase()
-        }}
-        (INN: {{ cert.inn }})
+        <div class="item-content">
+          {{ cert.userType }}
+          {{
+            cert.userType === 'PHYSICAL' ||
+            cert.userType === 'ENTREPRENEUR'
+              ? cert.cn?.toUpperCase()
+              : cert.org?.toUpperCase()
+          }}
+          <span v-if="cert.inn">INN: {{ cert.inn }}</span>
+          <span v-else> PINFL: {{ cert.pinfl }}</span>
+        </div>
         <button @click="signContent(cert)">
           Подписать
         </button>
@@ -69,7 +72,7 @@ const isDialogVisible = defineModel<boolean>({
   display: flex;
   flex-direction: column;
   gap: 20px;
-  font-size: 14px;
+  font-size: 12px;
 }
 .list li {
   display: flex;
@@ -79,5 +82,10 @@ const isDialogVisible = defineModel<boolean>({
   border: 1px solid #ccc;
   padding: 10px;
   border-radius: 10px;
+}
+.item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 </style>
