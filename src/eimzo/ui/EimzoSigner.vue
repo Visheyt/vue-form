@@ -19,7 +19,6 @@ onMounted(async () => {
   }
 })
 
-// Пример создания подписи
 const signContent = async (cert: Certificate) => {
   try {
     const keyId = await eimzo.loadKey(cert)
@@ -48,7 +47,14 @@ const signContent = async (cert: Certificate) => {
         v-for="cert in certificates"
         :key="cert.id"
       >
-        {{ cert.cn }} (INN: {{ cert.inn }})
+        {{ cert.userType }}
+        {{
+          cert.userType === 'PHYSICAL' ||
+          cert.userType === 'ENTREPRENEUR'
+            ? cert.cn?.toUpperCase()
+            : cert.org?.toUpperCase()
+        }}
+        (INN: {{ cert.inn }})
         <button @click="signContent(cert)">
           Подписать
         </button>

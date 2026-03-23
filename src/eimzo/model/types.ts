@@ -13,7 +13,7 @@ export type Certificate = {
   name: string
   validTo: string
   validFrom: string
-  isCompany: boolean
+  userType: EimzoUserType
 }
 
 export type CAPIResponse = {
@@ -21,3 +21,7 @@ export type CAPIResponse = {
   reason?: string
   [key: string]: any
 }
+export type EimzoUserType =
+  | 'PHYSICAL'
+  | 'LEGAL'
+  | 'ENTREPRENEUR'

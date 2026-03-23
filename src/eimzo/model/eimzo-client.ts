@@ -1,12 +1,16 @@
-import type { CAPIResponse, Certificate } from './types'
+import type {
+  CAPIResponse,
+  Certificate,
+  EimzoUserType,
+} from './types'
 
-// --- Eimzo Base64 ---
+// EimzoBase64 для кодирования в Base64 (для передачи данных в CAPI)
 export const EimzoBase64 = {
   encode: (s: string): string =>
     btoa(unescape(encodeURIComponent(s))),
 }
 
-// --- CAPI WebSocket Bridge ---
+// Wsocket API для взаимодействия с E-IMZO CAPI
 const CAPIWS = {
   URL:
     (window.location.protocol === 'https:'
@@ -44,7 +48,7 @@ const CAPIWS = {
   },
 }
 
-// --- EIMZO Client ---
+// EimzoClient для работы с E-IMZO CAPI
 export class EIMZOClient {
   private API_KEYS = [
     'localhost',
@@ -53,7 +57,6 @@ export class EIMZOClient {
     'A7BCFA5D490B351BE0754130DF03A068F855DB4333D43921125B9CF2670EF6A40370C646B90401955E1F7BC9CDBF59CE0B2C5467D820BE189C845D0B79CFC96F',
   ]
 
-  /** Инициализация E-IMZO */
   async init() {
     const { data } = await CAPIWS.callFunction({
       name: 'version',
@@ -76,7 +79,7 @@ export class EIMZOClient {
     return version
   }
 
-  /** Получить список всех сертификатов */
+  /** E-IMZO CAPI функция для получения списка всех сертификатов пользователя */
   async listAllUserKeys(): Promise<Certificate[]> {
     const { data } = await CAPIWS.callFunction({
       plugin: 'pfx',
@@ -101,7 +104,7 @@ export class EIMZOClient {
       })
   }
 
-  /** Загрузить ключ (E-IMZO prompt для пароля) */
+  /** Eimzo CAPI функция для загрузки ключа в память по данным сертификата */
   async loadKey(key: Certificate): Promise<string> {
     const args = [key.disk, key.path, key.name, key.alias]
     const { data } = await CAPIWS.callFunction({
@@ -113,7 +116,7 @@ export class EIMZOClient {
     return data.keyId
   }
 
-  /** Создать PKCS#7 подпись (CAdES-BES) */
+  /** Подписание данных с помощью ключа, загруженного в память (по keyId) */
   async createPkcs7(
     keyId: string,
     content: string,
@@ -131,7 +134,7 @@ export class EIMZOClient {
     return data.pkcs7_64
   }
 
-  /** Парсинг Alias сертификата */
+  // Вспомогательная функция для извлечения данных из alias сертификата
   private parseAlias(alias: string) {
     const extract = (key: string): string => {
       const regex = new RegExp(
@@ -141,17 +144,35 @@ export class EIMZOClient {
       const match = alias.match(regex)
       return match ? match[1].trim() : ''
     }
-
-    const inn = extract('1.2.860.3.16.1.1')
+    const innOrg = extract('1.2.860.3.16.1.1')
     const pinfl = extract('1.2.860.3.16.1.2')
-    const org = extract('o')
+    const uid = extract('uid')
+    const orgName = extract('o')
+    const cn = extract('cn')
+
+    let userType: EimzoUserType = 'PHYSICAL'
+
+    if (orgName) {
+      const orgUpper = orgName.toUpperCase()
+      const cnUpper = cn.toUpperCase()
+
+      const isEntrepreneur =
+        orgUpper.includes('YATT') ||
+        orgUpper.includes('YAKKA TARTIBDAGI') ||
+        orgUpper.includes('ЯТТ') ||
+        orgUpper.includes('ЯККА ТАРТИБДАГИ') ||
+        cnUpper.includes('YATT') ||
+        cnUpper.includes('ЯТТ')
+
+      userType = isEntrepreneur ? 'ENTREPRENEUR' : 'LEGAL'
+    }
 
     return {
-      inn: inn || extract('uid'),
+      inn: innOrg || uid,
       pinfl: pinfl,
-      cn: extract('cn'),
-      org: org,
-      isCompany: !!org || !!inn,
+      cn: cn,
+      org: orgName,
+      userType: userType,
       serial: extract('serialnumber'),
       validFrom: extract('validfrom'),
       validTo: extract('validto'),
