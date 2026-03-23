@@ -1,14 +1,9 @@
+import { EimzoBase64 } from '../lib/eimzo-base64'
 import type {
   CAPIResponse,
   Certificate,
   EimzoUserType,
 } from './types'
-
-// EimzoBase64 для кодирования в Base64 (для передачи данных в CAPI)
-export const EimzoBase64 = {
-  encode: (s: string): string =>
-    btoa(unescape(encodeURIComponent(s))),
-}
 
 // Wsocket API для взаимодействия с E-IMZO CAPI
 const CAPIWS = {
@@ -50,12 +45,14 @@ const CAPIWS = {
 
 // EimzoClient для работы с E-IMZO CAPI
 export class EIMZOClient {
-  private API_KEYS = [
-    'localhost',
-    '96D0C1491615C82B9A54D9989779DF825B690748224C2B04F500F370D51827CE2644D8D4A82C18184D73AB8530BB8ED537269603F61DB0D03D2104ABF789970B',
-    '127.0.0.1',
-    'A7BCFA5D490B351BE0754130DF03A068F855DB4333D43921125B9CF2670EF6A40370C646B90401955E1F7BC9CDBF59CE0B2C5467D820BE189C845D0B79CFC96F',
-  ]
+  constructor(
+    private apiKeys: string[] = [
+      'localhost',
+      '96D0C1491615C82B9A54D9989779DF825B690748224C2B04F500F370D51827CE2644D8D4A82C18184D73AB8530BB8ED537269603F61DB0D03D2104ABF789970B',
+      '127.0.0.1',
+      'A7BCFA5D490B351BE0754130DF03A068F855DB4333D43921125B9CF2670EF6A40370C646B90401955E1F7BC9CDBF59CE0B2C5467D820BE189C845D0B79CFC96F',
+    ],
+  ) {}
 
   async init() {
     const { data } = await CAPIWS.callFunction({
@@ -71,7 +68,7 @@ export class EIMZOClient {
 
     const { data: apiData } = await CAPIWS.callFunction({
       name: 'apikey',
-      arguments: this.API_KEYS,
+      arguments: this.apiKeys,
     })
     if (!apiData.success)
       throw new Error('Ошибка API_KEY: ' + apiData.reason)
