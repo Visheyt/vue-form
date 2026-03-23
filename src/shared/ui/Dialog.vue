@@ -5,24 +5,30 @@ const isDialogVisible = defineModel<boolean>({
 </script>
 
 <template>
-  <div
-    class="wrapper"
-    v-if="isDialogVisible"
-    @click="isDialogVisible = false"
-  >
+  <Transition name="pop">
     <div
-      class="content"
-      @click.stop
+      class="wrapper"
+      v-if="isDialogVisible"
+      @click="isDialogVisible = false"
     >
-      <slot />
-      <button @click="isDialogVisible = false">
-        Close
-      </button>
+      <div
+        class="content"
+        @click.stop
+      >
+        <slot />
+        <button
+          class="close-btn"
+          @click="isDialogVisible = false"
+        >
+          Закрыть
+        </button>
+      </div>
     </div>
-  </div>
+  </Transition>
 </template>
 
 <style scoped>
+/* Фон */
 .wrapper {
   display: flex;
   align-items: center;
@@ -33,15 +39,38 @@ const isDialogVisible = defineModel<boolean>({
   top: 0;
   left: 0;
   background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 }
 
 .content {
   max-width: 450px;
-  padding: 20px;
+  padding: 24px;
   background: #fff;
-  border-radius: 8px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.pop-enter-active,
+.pop-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.pop-enter-active .content,
+.pop-leave-active .content {
+  transition: transform 0.2s
+    cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+.pop-enter-from,
+.pop-leave-to {
+  opacity: 0;
+}
+
+.pop-enter-from .content,
+.pop-leave-to .content {
+  transform: scale(0.8);
 }
 </style>
