@@ -14,7 +14,8 @@ onMounted(async () => {
   try {
     version.value = await eimzo.init()
     certificates.value = await eimzo.listAllUserKeys()
-    console.log('Сертификаты:', certificates.value)
+
+    console.log(certificates.value)
   } catch (err: any) {
     errorMsg.value = err.message || String(err)
   }
@@ -36,6 +37,17 @@ const signContent = async (cert: Certificate) => {
 const isDialogVisible = defineModel<boolean>({
   required: true,
 })
+
+const signContentForToken = async () => {
+  try {
+    await eimzo.listCkcTokens()
+    const signed =
+      await eimzo.createPkcs7ForToken('Hello world')
+    console.log('Подпись с токеном Base64:', signed)
+  } catch (err: any) {
+    console.error('Ошибка подписи с токеном:', err)
+  }
+}
 </script>
 
 <template>
@@ -63,6 +75,12 @@ const isDialogVisible = defineModel<boolean>({
           Подписать
         </button>
       </li>
+      <button
+        @click="signContentForToken()"
+        class="token-button"
+      >
+        Подписать с помощью токена
+      </button>
     </ul></Dialog
   >
 </template>
@@ -87,5 +105,11 @@ const isDialogVisible = defineModel<boolean>({
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+.token-button {
+  max-width: 150px;
+  align-self: center;
+  padding: 5px 10px;
+  font-weight: 600;
 }
 </style>

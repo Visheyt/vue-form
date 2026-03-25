@@ -101,6 +101,28 @@ export class EIMZOClient {
       })
   }
 
+  /** Получение списка подключенных USB-токенов или облачных ключей */
+  async listCkcTokens(): Promise<any[]> {
+    const { data } = await CAPIWS.callFunction({
+      plugin: 'ckc',
+      name: 'list_ckc',
+    })
+
+    if (!data.success) {
+      throw new Error(
+        data.reason ||
+          'Ошибка при получении списка токенов',
+      )
+    }
+
+    // Возвращаем список устройств (например, FeiTian, JaCarta и т.д.)
+    return (data.devices || []).map((device: any) => ({
+      ...device,
+      type: 'ckc', // Метка, что это токен
+      id: device.deviceID,
+    }))
+  }
+
   /** Eimzo CAPI функция для загрузки ключа в память по данным сертификата */
   async loadKey(key: Certificate): Promise<string> {
     const args = [key.disk, key.path, key.name, key.alias]
@@ -128,6 +150,29 @@ export class EIMZOClient {
       arguments: [data64, keyId, 'no'],
     })
     if (!data.success) throw new Error(data.reason)
+    return data.pkcs7_64
+  }
+
+  async createPkcs7ForToken(
+    content: string,
+    isBase64 = false,
+  ): Promise<string> {
+    const data64 = isBase64
+      ? content
+      : EimzoBase64.encode(content)
+
+    const { data } = await CAPIWS.callFunction({
+      plugin: 'pkcs7',
+      name: 'create_pkcs7',
+      arguments: [data64, 'ckc', 'no'],
+    })
+
+    if (!data.success) {
+      throw new Error(
+        data.reason || 'Ошибка при подписании токеном',
+      )
+    }
+
     return data.pkcs7_64
   }
 
