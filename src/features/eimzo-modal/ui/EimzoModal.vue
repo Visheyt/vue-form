@@ -1,53 +1,45 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { eimzoClient, type Certificate } from "@/app/configs/eimzo";
+import { ref, onMounted } from "vue";
 
-import { EIMZOClient } from '../model/eimzo-client'
-import type { Certificate } from '../model/types'
-import Dialog from '@/shared/ui/Dialog.vue'
-
-const eimzo = new EIMZOClient()
-const version = ref<number | null>(null)
-const certificates = ref<Certificate[]>([])
-const errorMsg = ref<string | null>(null)
+const version = ref<number | null>(null);
+const certificates = ref<Certificate[]>([]);
+const errorMsg = ref<string | null>(null);
 
 onMounted(async () => {
   try {
-    version.value = await eimzo.init()
-    certificates.value = await eimzo.listAllUserKeys()
+    version.value = await eimzoClient.init();
+    certificates.value = await eimzoClient.listAllUserKeys();
 
-    console.log(certificates.value)
+    console.log(certificates.value);
   } catch (err: any) {
-    errorMsg.value = err.message || String(err)
+    errorMsg.value = err.message || String(err);
   }
-})
+});
 
 const signContent = async (cert: Certificate) => {
   try {
-    const keyId = await eimzo.loadKey(cert)
-    const signed = await eimzo.createPkcs7(
-      keyId,
-      'Hello world',
-    )
-    console.log('Подпись Base64:', signed)
+    const keyId = await eimzoClient.loadKey(cert);
+    const signed = await eimzoClient.createPkcs7(keyId, "Hello world");
+    console.log("Подпись Base64:", signed);
   } catch (err: any) {
-    console.error('Ошибка подписи:', err)
+    console.error("Ошибка подписи:", err);
   }
-}
+};
 
 const isDialogVisible = defineModel<boolean>({
   required: true,
-})
+});
 
 const signContentForToken = async () => {
   try {
-    await eimzo.listCkcTokens()
-    const signed =
-      await eimzo.createPkcs7ForToken('Hello world')
-    console.log('Подпись с токеном Base64:', signed)
+    await eimzoClient.listCkcTokens();
+    const signed = await eimzoClient.createPkcs7ForToken("Hello world");
+    console.log("Подпись с токеном Base64:", signed);
   } catch (err: any) {
-    console.error('Ошибка подписи с токеном:', err)
+    console.error("Ошибка подписи с токеном:", err);
   }
-}
+};
 </script>
 
 <template>
@@ -56,29 +48,20 @@ const signContentForToken = async () => {
     <p>Выберите сертификат для входа:</p>
 
     <ul class="list">
-      <li
-        v-for="cert in certificates"
-        :key="cert.id"
-      >
+      <li v-for="cert in certificates" :key="cert.id">
         <div class="item-content">
           {{ cert.userType }}
           {{
-            cert.userType === 'PHYSICAL' ||
-            cert.userType === 'ENTREPRENEUR'
+            cert.userType === "PHYSICAL" || cert.userType === "ENTREPRENEUR"
               ? cert.cn?.toUpperCase()
               : cert.org?.toUpperCase()
           }}
           <span v-if="cert.inn">INN: {{ cert.inn }}</span>
           <span v-else> PINFL: {{ cert.pinfl }}</span>
         </div>
-        <button @click="signContent(cert)">
-          Подписать
-        </button>
+        <button @click="signContent(cert)">Подписать</button>
       </li>
-      <button
-        @click="signContentForToken()"
-        class="token-button"
-      >
+      <button @click="signContentForToken()" class="token-button">
         Подписать с помощью токена
       </button>
     </ul></Dialog
