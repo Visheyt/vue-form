@@ -1,12 +1,16 @@
 <script lang="ts" setup>
 import { Logo } from "@/shared/ui";
+
+const emit = defineEmits<{
+  openProfile: [];
+}>();
 </script>
 
 <template>
   <header class="header">
     <Logo />
     <nav>Tuda Suada asdas</nav>
-    <button class="button">
+    <button class="button" @click="emit('openProfile')">
       <span>OOO "Aleksey"</span>
       <icon-mdi-keyboard-arrow-down />
     </button>
