@@ -16,6 +16,7 @@ declare module 'vue' {
     EimzoModal: typeof import('./src/features/eimzo-modal/ui/EimzoModal.vue')['default']
     Footer: typeof import('./src/widgets/footer/ui/Footer.vue')['default']
     Header: typeof import('./src/widgets/header/ui/Header.vue')['default']
+    Icon: typeof import('./src/shared/ui/icon/Icon.vue')['default']
     IconMdiKeyboardArrowDawn: typeof import('~icons/mdi/keyboard-arrow-dawn')['default']
     IconMdiKeyboardArrowDown: typeof import('~icons/mdi/keyboard-arrow-down')['default']
     LoginForm: typeof import('./src/features/login-form/ui/LoginForm.vue')['default']
