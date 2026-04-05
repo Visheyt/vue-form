@@ -8,7 +8,7 @@ import { Logo } from "@/shared/ui";
     <nav>Tuda Suada asdas</nav>
     <button class="button">
       <span>OOO "Aleksey"</span>
-      <Icon icon="mdi:keyboard-arrow-down"></Icon>
+      <icon-mdi-keyboard-arrow-down />
     </button>
   </header>
 </template>
