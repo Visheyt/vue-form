@@ -1,27 +1,15 @@
 <script setup lang="ts">
 const isDialogVisible = defineModel<boolean>({
   required: true,
-})
+});
 </script>
 
 <template>
   <Transition name="pop">
-    <div
-      class="wrapper"
-      v-if="isDialogVisible"
-      @click="isDialogVisible = false"
-    >
-      <div
-        class="content"
-        @click.stop
-      >
+    <div class="wrapper" v-if="isDialogVisible" @click="isDialogVisible = false">
+      <div class="content" @click.stop>
         <slot />
-        <button
-          class="close-btn"
-          @click="isDialogVisible = false"
-        >
-          Закрыть
-        </button>
+        <button class="close-btn" @click="isDialogVisible = false">Закрыть</button>
       </div>
     </div>
   </Transition>
@@ -61,8 +49,7 @@ const isDialogVisible = defineModel<boolean>({
 
 .pop-enter-active .content,
 .pop-leave-active .content {
-  transition: transform 0.2s
-    cubic-bezier(0.34, 1.3, 0.64, 1);
+  transition: transform 0.2s cubic-bezier(0.34, 1.3, 0.64, 1);
 }
 
 .pop-enter-from,

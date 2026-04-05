@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { eimzoClient, type Certificate } from "@/app/configs/eimzo";
+import { Dialog } from "@/shared/ui";
 import { ref, onMounted } from "vue";
 
 const version = ref<number | null>(null);
