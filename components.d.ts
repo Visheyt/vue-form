@@ -28,5 +28,6 @@ declare module 'vue' {
     Profile: typeof import('./src/widgets/profile/ui/Profile.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Select: typeof import('./src/shared/ui/select/Select.vue')['default']
   }
 }
